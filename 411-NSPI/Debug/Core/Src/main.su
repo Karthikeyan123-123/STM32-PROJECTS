@@ -1,0 +1,15 @@
+../Drivers/CMSIS/Include/core_cm4.h:2064:26:ITM_SendChar	16	static,ignoring_inline_asm
+../Core/Src/main.c:112:5:main	8	static
+../Core/Src/main.c:205:6:SystemClock_Config	88	static
+../Core/Src/main.c:247:13:MX_SPI1_Init	8	static
+../Core/Src/main.c:285:13:MX_GPIO_Init	40	static
+../Core/Src/main.c:312:9:SD_SPI_TxRx	32	static
+../Core/Src/main.c:325:6:SD_Select	8	static
+../Core/Src/main.c:332:6:SD_Deselect	8	static
+../Core/Src/main.c:339:6:SD_SendClockTrain	16	static
+../Core/Src/main.c:349:9:SD_SendCommand	24	static
+../Core/Src/main.c:383:5:__io_putchar	16	static
+../Core/Src/main.c:389:9:SD_Init	32	static
+../Core/Src/main.c:455:9:SD_ReadBlock	40	static
+../Core/Src/main.c:500:9:SD_WriteBlock	32	static
+../Core/Src/main.c:551:6:Error_Handler	4	static,ignoring_inline_asm
