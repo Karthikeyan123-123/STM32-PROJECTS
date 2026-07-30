@@ -22,71 +22,29 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include "fatfs.h"
+#include "fatfs_sd.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-uint8_t tx;
-uint8_t rx;
-uint8_t dummy = 0xFF;
-uint8_t txBuf[512];
-uint8_t rxBuf[512];
-uint8_t status1;
-uint8_t status2;
 
-uint8_t ok = 1;
-
-FATFS fs;
-FIL file;
-FRESULT fr;
-UINT bytesRead;
-
-char buffer[128];
-
-
-#define SD_OK             0
-#define SD_CMD_ERROR      1
-#define SD_TOKEN_ERROR    2
-#define SD_TIMEOUT        3
-#define SD_WRITE_ERROR    4
-
-
-
-#define SD_CS_PORT GPIOA
-#define SD_CS_PIN  GPIO_PIN_4
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-void SD_Select(void);
-void SD_Deselect(void);
-
-uint8_t SD_SPI_TxRx(uint8_t data);
-
-void SD_SendClockTrain(void);
-
-uint8_t SD_SendCommand(uint8_t cmd,
-                       uint32_t arg,
-                       uint8_t crc);
-int __io_putchar(int ch);
-uint8_t SD_Init(void);
-uint8_t SD_ReadBlock(uint32_t sector, uint8_t *buffer);
-uint8_t SD_WriteBlock(uint32_t sector, uint8_t *buffer);
-
-
-
 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+int ret;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
+
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -96,6 +54,7 @@ SPI_HandleTypeDef hspi1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -103,6 +62,26 @@ static void MX_SPI1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+FATFS fs;		// file system
+FIL file; 		// file
+FRESULT res; 	// result
+
+char buffer[1024];
+UINT br, bw;	// file read/write count
+
+/* Capacity related variables */
+FATFS *pfs;
+DWORD fre_clust;
+uint32_t total, free_space;
+
+
+/* Function for sending Uart Data */
+void send_uart(char* string)
+{
+	uint8_t len = strlen(string);
+	HAL_UART_Transmit(&huart2, (uint8_t *)string, len, 2000);
+}
 /* USER CODE END 0 */
 
 /**
@@ -136,49 +115,67 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_FATFS_Init();
-
-  fr = f_mount(&fs, "", 1);
-
-  if(fr != FR_OK)
-  {
-      printf("Mount Failed : %d\r\n", fr);
-      Error_Handler();
-  }
-
-  fr = f_open(&file, "karthi.txt", FA_READ);
-
-  if(fr != FR_OK)
-  {
-      printf("Open Failed : %d\r\n", fr);
-      Error_Handler();
-  }
-
-  fr = f_read(&file,
-              buffer,
-              sizeof(buffer)-1,
-              &bytesRead);
-
-  if(fr != FR_OK)
-  {
-      printf("Read Failed : %d\r\n", fr);
-      Error_Handler();
-  }
-
-  buffer[bytesRead] = '\0';
-
-  printf("File Content:\r\n");
-  printf("%s\r\n", buffer);
-
-  f_close(&file);
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
 
+    char writeData[] = "Hello Karthikeyan!\r\n";
+
+    res = f_mount(&fs, "", 1);
+    if(res != FR_OK)
+    {
+        send_uart("Mount Failed\r\n");
+        return 0;
+    }
+
+    res = f_open(&file, "new.txt", FA_CREATE_ALWAYS | FA_WRITE);
+
+    if(res == FR_OK)
+    {
+        res = f_write(&file,
+                      writeData,
+                      strlen(writeData),
+                      &bw);
+
+        if(res == FR_OK)
+        {
+            send_uart("Write Success\r\n");
+        }
+        else
+        {
+            send_uart("Write Failed\r\n");
+        }
+
+        f_close(&file);
+    }
+    else
+    {
+        send_uart("Open Failed\r\n");
+    }
 
 
+    char readBuffer[100];
+    UINT br;
 
+    res = f_open(&file, "new.txt", FA_READ);
 
+    if(res == FR_OK)
+    {
+        res = f_read(&file,
+                     readBuffer,
+                     sizeof(readBuffer)-1,
+                     &br);
 
+        if(res == FR_OK)
+        {
+            readBuffer[br] = '\0';
 
+            send_uart("Data = ");
+            send_uart(readBuffer);
+        }
+
+        f_close(&file);
+    }
 
 
 
@@ -218,7 +215,12 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 64;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -228,8 +230,8 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV4;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
@@ -278,6 +280,39 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 9600;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -291,7 +326,6 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
@@ -309,239 +343,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint8_t SD_SPI_TxRx(uint8_t data)
-{
-    uint8_t rx;
 
-    HAL_SPI_TransmitReceive(&hspi1,
-                            &data,
-                            &rx,
-                            1,
-                            HAL_MAX_DELAY);
-
-    return rx;
-}
-
-void SD_Select(void)
-{
-    HAL_GPIO_WritePin(SD_CS_PORT,
-                      SD_CS_PIN,
-                      GPIO_PIN_RESET);
-}
-
-void SD_Deselect(void)
-{
-    HAL_GPIO_WritePin(SD_CS_PORT,
-                      SD_CS_PIN,
-                      GPIO_PIN_SET);
-}
-
-void SD_SendClockTrain(void)
-{
-    SD_Deselect();
-
-    for(int i = 0; i < 10; i++)
-    {
-        SD_SPI_TxRx(0xFF);
-    }
-}
-
-uint8_t SD_SendCommand(uint8_t cmd,
-                       uint32_t arg,
-                       uint8_t crc)
-{
-    uint8_t response;
-
-    SD_Select();
-
-    /* Give the card 8 clocks after CS goes LOW */
-    SD_SPI_TxRx(0xFF);
-
-    SD_SPI_TxRx(0x40 | cmd);
-
-    SD_SPI_TxRx((arg >> 24) & 0xFF);
-
-    SD_SPI_TxRx((arg >> 16) & 0xFF);
-
-    SD_SPI_TxRx((arg >> 8) & 0xFF);
-
-    SD_SPI_TxRx(arg & 0xFF);
-
-    SD_SPI_TxRx(crc);
-
-    for(int i = 0; i < 10; i++)
-    {
-        response = SD_SPI_TxRx(0xFF);
-
-        if(response != 0xFF)
-            return response;
-    }
-
-    return 0xFF;
-}
-
-int __io_putchar(int ch)
-{
-    ITM_SendChar(ch);
-    return ch;
-}
-
-uint8_t SD_Init()
-{
-    uint8_t r1;
-    uint8_t ocr[4];
-    uint32_t timeout;
-
-    SD_SendClockTrain();
-
-    SD_Deselect();
-
-
-
-    r1 = SD_SendCommand(0, 0x00000000, 0x95);
-    if(r1 != 0x01)
-        return SD_CMD_ERROR;
-
-    SD_Deselect();
-    SD_SPI_TxRx(0xFF);
-
-    r1 = SD_SendCommand(8, 0x000001AA, 0x87);
-    if(r1 != 0x01)
-        return SD_CMD_ERROR;
-
-    for(int i=0;i<4;i++)
-        ocr[i] = SD_SPI_TxRx(0xFF);
-
-    SD_Deselect();
-    SD_SPI_TxRx(0xFF);
-
-    timeout = 10000;
-
-    do
-    {
-        r1 = SD_SendCommand(55,0,0x01);
-
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-
-        if(r1 > 1)
-            return SD_CMD_ERROR;
-
-        r1 = SD_SendCommand(41,0x40000000,0x01);
-
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-
-        if(timeout-- == 0)
-            return SD_TIMEOUT;
-
-    }while(r1 != 0x00);
-
-    r1 = SD_SendCommand(58,0,0x01);
-
-    if(r1 != 0x00)
-        return SD_CMD_ERROR;
-
-    for(int i=0;i<4;i++)
-        ocr[i] = SD_SPI_TxRx(0xFF);
-
-    SD_Deselect();
-    SD_SPI_TxRx(0xFF);
-
-    return SD_OK;
-}
-
-
-uint8_t SD_ReadBlock(uint32_t sector, uint8_t *buffer)
-{
-    uint8_t token;
-    uint8_t crc[2];
-    uint32_t timeout = 100000;
-
-    if(SD_SendCommand(17, sector, 0x01) != 0x00)
-    {
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-        return SD_CMD_ERROR;
-    }
-
-    do
-    {
-        token = SD_SPI_TxRx(0xFF);
-
-        if(timeout-- == 0)
-        {
-            SD_Deselect();
-            SD_SPI_TxRx(0xFF);
-            return SD_TIMEOUT;
-        }
-
-    }while(token == 0xFF);
-
-    if(token != 0xFE)
-    {
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-        return SD_TOKEN_ERROR;
-    }
-
-    for(int i=0;i<512;i++)
-        buffer[i] = SD_SPI_TxRx(0xFF);
-
-    crc[0] = SD_SPI_TxRx(0xFF);
-    crc[1] = SD_SPI_TxRx(0xFF);
-
-    SD_Deselect();
-    SD_SPI_TxRx(0xFF);
-
-    return SD_OK;
-}
-
-uint8_t SD_WriteBlock(uint32_t sector, uint8_t *buffer)
-{
-    uint8_t response;
-    uint32_t timeout = 100000;
-
-    if(SD_SendCommand(24, sector, 0x01) != 0x00)
-    {
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-        return SD_CMD_ERROR;
-    }
-
-    SD_SPI_TxRx(0xFE);
-
-    for(int i=0;i<512;i++)
-        SD_SPI_TxRx(buffer[i]);
-
-    SD_SPI_TxRx(0xFF);
-    SD_SPI_TxRx(0xFF);
-
-    response = SD_SPI_TxRx(0xFF);
-    response &= 0x1F;
-
-    if(response != 0x05)
-    {
-        SD_Deselect();
-        SD_SPI_TxRx(0xFF);
-        return SD_WRITE_ERROR;
-    }
-
-    while(SD_SPI_TxRx(0xFF) == 0x00)
-    {
-        if(timeout-- == 0)
-        {
-            SD_Deselect();
-            SD_SPI_TxRx(0xFF);
-            return SD_TIMEOUT;
-        }
-    }
-
-    SD_Deselect();
-    SD_SPI_TxRx(0xFF);
-
-    return SD_OK;
-}
 /* USER CODE END 4 */
 
 /**

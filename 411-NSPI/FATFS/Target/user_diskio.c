@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -27,21 +27,10 @@
  * the section contents can be deleted.
  */
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 #endif
 
 /* USER CODE BEGIN DECL */
-#include "main.h"
-
-extern uint8_t SD_Init(void);
-extern uint8_t SD_ReadBlock(uint32_t sector, uint8_t *buffer);
-extern uint8_t SD_WriteBlock(uint32_t sector, uint8_t *buffer);
-#define SD_OK             0
-#define SD_CMD_ERROR      1
-#define SD_TOKEN_ERROR    2
-#define SD_TIMEOUT        3
-#define SD_WRITE_ERROR    4
 
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
@@ -92,15 +81,7 @@ DSTATUS USER_initialize (
 )
 {
   /* USER CODE BEGIN INIT */
-
-	if(SD_Init() == SD_OK){
-		Stat = 0;
-	}
-	else{
-    Stat = STA_NOINIT;
-	}
-    return Stat;
-
+    return SD_disk_initialize(pdrv);
   /* USER CODE END INIT */
 }
 
@@ -114,8 +95,7 @@ DSTATUS USER_status (
 )
 {
   /* USER CODE BEGIN STATUS */
-
-    return Stat;
+    return SD_disk_status(pdrv);
   /* USER CODE END STATUS */
 }
 
@@ -135,15 +115,7 @@ DRESULT USER_read (
 )
 {
   /* USER CODE BEGIN READ */
-	while(count--)
-	{
-	    if(SD_ReadBlock(sector, buff) != SD_OK)
-	        return RES_ERROR;
-
-	    sector++;
-	    buff += 512;
-	}
-    return RES_OK;
+    return SD_disk_read(pdrv, buff, sector, count);
   /* USER CODE END READ */
 }
 
@@ -165,16 +137,7 @@ DRESULT USER_write (
 {
   /* USER CODE BEGIN WRITE */
   /* USER CODE HERE */
-
-	while(count--)
-	{
-	    if(SD_WriteBlock(sector, (uint8_t*)buff) != SD_OK)
-	        return RES_ERROR;
-
-	    sector++;
-	    buff += 512;
-	}
-    return RES_OK;
+    return SD_disk_write(pdrv, buff, sector, count);
   /* USER CODE END WRITE */
 }
 #endif /* _USE_WRITE == 1 */
@@ -194,20 +157,7 @@ DRESULT USER_ioctl (
 )
 {
   /* USER CODE BEGIN IOCTL */
-	switch(cmd)
-	{
-	case CTRL_SYNC:
-	    return RES_OK;
-
-	case GET_SECTOR_SIZE:
-
-	    *(WORD *)buff = 512;
-	    return RES_OK;
-
-	default:
-
-	    return RES_PARERR;
-	}
+    return SD_disk_ioctl(pdrv, cmd, buff);
   /* USER CODE END IOCTL */
 }
 #endif /* _USE_IOCTL == 1 */

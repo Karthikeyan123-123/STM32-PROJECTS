@@ -38,34 +38,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := 411-NSPI
+BUILD_ARTIFACT_NAME := UP-SD
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-411-NSPI.elf \
+UP-SD.elf \
 
 MAP_FILES += \
-411-NSPI.map \
+UP-SD.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-411-NSPI.list \
+UP-SD.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: 411-NSPI.elf secondary-outputs
+main-build: UP-SD.elf secondary-outputs
 
 # Tool invocations
-411-NSPI.elf 411-NSPI.map: $(OBJS) $(USER_OBJS) C:\Users\karthikeyan\ m\STM32CubeIDE\workspace_1.19.0\411-NSPI\STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "411-NSPI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\karthikeyan m\STM32CubeIDE\workspace_1.19.0\411-NSPI\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="411-NSPI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+UP-SD.elf UP-SD.map: $(OBJS) $(USER_OBJS) C:\Users\karthikeyan\ m\STM32CubeIDE\workspace_1.19.0\UP-SD\STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "UP-SD.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\karthikeyan m\STM32CubeIDE\workspace_1.19.0\UP-SD\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UP-SD.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -74,14 +74,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-411-NSPI.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "411-NSPI.list"
+UP-SD.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "UP-SD.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) 411-NSPI.elf 411-NSPI.list 411-NSPI.map default.size.stdout
+	-$(RM) UP-SD.elf UP-SD.list UP-SD.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
