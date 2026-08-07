@@ -1,0 +1,11 @@
+..\Core\Src\lcd.c:5:6:Enable_Pulse	8	static
+..\Core\Src\lcd.c:12:6:LCD_SendInitNibble	16	static
+..\Core\Src\lcd.c:21:6:Send_Nibble	16	static
+..\Core\Src\lcd.c:30:6:Lcd_Sendbyte	16	static
+..\Core\Src\lcd.c:35:6:Lcd_Command	16	static
+..\Core\Src\lcd.c:43:6:Lcd_Data	16	static
+..\Core\Src\lcd.c:51:6:Lcd_Init	8	static
+..\Core\Src\lcd.c:76:6:Lcd_Clear	8	static
+..\Core\Src\lcd.c:80:6:Lcd_Home	8	static
+..\Core\Src\lcd.c:84:6:Lcd_Setcursor	24	static
+..\Core\Src\lcd.c:95:6:Lcd_Print	16	static
