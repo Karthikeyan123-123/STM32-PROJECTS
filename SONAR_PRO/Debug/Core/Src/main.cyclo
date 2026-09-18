@@ -1,0 +1,12 @@
+../Core/Src/main.c:82:5:main	1
+../Core/Src/main.c:164:6:SystemClock_Config	3
+../Core/Src/main.c:206:13:MX_ADC1_Init	4
+../Core/Src/main.c:266:13:MX_ADC2_Init	3
+../Core/Src/main.c:318:13:MX_DAC_Init	3
+../Core/Src/main.c:355:13:MX_TIM2_Init	4
+../Core/Src/main.c:395:13:MX_DMA_Init	1
+../Core/Src/main.c:413:13:MX_GPIO_Init	1
+../Core/Src/main.c:426:6:Read_Environment	1
+../Core/Src/main.c:452:6:Adaptive_Frequency_Algorithm	3
+../Core/Src/main.c:485:6:Set_Sonar_Frequency	1
+../Core/Src/main.c:561:6:Error_Handler	1
