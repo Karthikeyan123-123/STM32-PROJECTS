@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "HTS221.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,22 +44,40 @@
 I2C_HandleTypeDef hi2c2;
 
 /* USER CODE BEGIN PV */
-#define SLAVER (0x5F<<1)
-uint16_t humidity;
-int16_t temperature;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C2_Init(void);
+void Error_Handler(void);
+float H0_RH;
+float H1_RH;
+
+float T0_degC;
+float T1_degC;
+
+int16_t H0_T0_OUT;
+int16_t H1_T0_OUT;
+
+int16_t T0_OUT;
+int16_t T1_OUT;
+
+uint8_t ctrl = 0x85;
+
 /* USER CODE BEGIN PFP */
-uint8_t Data[5];
 int __io_putchar(int ch)
 {
     ITM_SendChar(ch);
     return ch;
 }
+
+int16_t raw_humidity;
+int16_t raw_temperature;
+
+float humidity;
+float temperature;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -97,7 +116,14 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_I2C_Mem_Write(&hi2c2,
+                    HTS221_ADDR,
+                    CTRL_REG1,
+                    I2C_MEMADD_SIZE_8BIT,
+                    &ctrl,
+                    1,
+                    HAL_MAX_DELAY);
+  HTS221_ReadCalibration();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -107,21 +133,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HTS221_ReadRaw(&raw_humidity,
+	                    &raw_temperature);
 
-	  HAL_I2C_Mem_Read(&hi2c2,
-	                   0x5F<<1,
-					   0x28 | 0x80,
-	                   I2C_MEMADD_SIZE_8BIT,
-	                   Data,
-	                   4,
-	                   HAL_MAX_DELAY);
-	  humidity = Data[0]|(Data[1]<<8);
-	  temperature = Data[2]|(Data[3]<<8);
-      printf("Humidity: %u\n", humidity);
-      printf("temperature: %d\n", temperature);
+	     humidity =
+	         HTS221_GetHumidity(raw_humidity);
 
+	     temperature =
+	         HTS221_GetTemperature(raw_temperature);
 
-      HAL_Delay(500);
+	     printf("Temperature = %.2f C\r\n", temperature);
+	     printf("Humidity    = %.2f %%\r\n", humidity);
+
+	     HAL_Delay(1000);
 
 
 
