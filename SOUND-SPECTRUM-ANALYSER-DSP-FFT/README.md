@@ -94,7 +94,6 @@ Instead of simply using a ready-made audio library, the project focuses on under
                     └─────────────────┘
             
 Embedded Signal Analyzer
-          
 • Waveform                
 • FFT Spectrum            
 • Peak Frequency          
