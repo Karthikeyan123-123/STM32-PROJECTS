@@ -1,4 +1,5 @@
-<img width="642" height="720" alt="Screenshot 2026-09-26 230204" src="https://github.com/user-attachments/assets/05e9c900-535a-4660-a2d4-a2cfc74c3020" />
+<img width="1907" height="1037" alt="Screenshot 2026-09-26 231444" src="https://github.com/user-attachments/assets/120e3a12-36ea-4375-b33a-3f18c16780eb" />
+
 
 # HTS221 Temperature & Humidity Sensor — Register-Level Learning
 
