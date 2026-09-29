@@ -1,0 +1,5 @@
+../Core/Src/LSM6DSL.c:8:19:LSM6DSL_ReadReg	32	static
+../Core/Src/LSM6DSL.c:25:19:LSM6DSL_WriteReg	32	static
+../Core/Src/LSM6DSL.c:50:19:LSM6DSL_Init	16	static
+../Core/Src/LSM6DSL.c:144:19:LSM6DSL_ReadAccel	32	static
+../Core/Src/LSM6DSL.c:183:19:LSM6DSL_ReadGyro	40	static

@@ -1,0 +1,5 @@
+../Core/Src/LSM6DSL.c:8:19:LSM6DSL_ReadReg	1
+../Core/Src/LSM6DSL.c:25:19:LSM6DSL_WriteReg	1
+../Core/Src/LSM6DSL.c:50:19:LSM6DSL_Init	6
+../Core/Src/LSM6DSL.c:144:19:LSM6DSL_ReadAccel	2
+../Core/Src/LSM6DSL.c:183:19:LSM6DSL_ReadGyro	2

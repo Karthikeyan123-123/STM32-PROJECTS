@@ -1,0 +1,5 @@
+../Core/Src/ble_app.c:74:9:BLE_App_Init	6
+../Core/Src/ble_app.c:198:10:aci_IMU_char	2
+../Core/Src/ble_app.c:229:9:BLE_App_StartAdvertising	2
+../Core/Src/ble_app.c:262:9:BLE_App_SendTemperature	2
+../Core/Src/ble_app.c:314:9:BLE_App_SendAcceleration	2
