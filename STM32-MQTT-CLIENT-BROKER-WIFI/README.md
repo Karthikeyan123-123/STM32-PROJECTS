@@ -1,6 +1,6 @@
 # STM32L4S5 IoT Temperature & Humidity MQTT
 
-## Overview
+## Overview     P9 = 0  //for not license for broker//
 
 This project reads **temperature and humidity** from the **HTS221** sensor using an STM32L4S5 microcontroller and publishes the sensor data to an **MQTT broker** over Wi-Fi.
 
