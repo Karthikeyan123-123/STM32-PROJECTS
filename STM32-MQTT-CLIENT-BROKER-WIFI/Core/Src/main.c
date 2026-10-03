@@ -49,11 +49,11 @@ I2C_HandleTypeDef hi2c2;
 SPI_HandleTypeDef hspi3;
 
 /* USER CODE BEGIN PV */
-#define MQTT_HOST       "stm32-cluster-fe8e3dac.a03.euc1.aws.hivemq.cloud"
+#define MQTT_HOST       "*****-cluster-fe8e3dac.a03.euc1.aws.hivemq.cloud"
 #define MQTT_PORT       8883
 
-#define MQTT_USERNAME   "Karthikeyan"
-#define MQTT_PASSWORD   "Karthikarthi"
+#define MQTT_USERNAME   "Karthi*******"
+#define MQTT_PASSWORD   "Karthi******"
 
 #define MQTT_CLIENT_ID  "STM32L4S5_01"
 
