@@ -1,0 +1,5 @@
+../Core/Src/HTS221.c:18:19:HTS221_ReadReg	1
+../Core/Src/HTS221.c:31:6:HTS221_ReadCalibration	1
+../Core/Src/HTS221.c:136:6:HTS221_ReadRaw	1
+../Core/Src/HTS221.c:169:7:HTS221_GetTemperature	1
+../Core/Src/HTS221.c:182:7:HTS221_GetHumidity	1
