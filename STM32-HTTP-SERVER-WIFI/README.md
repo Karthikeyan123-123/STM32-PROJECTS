@@ -1,3 +1,5 @@
+<img width="1035" height="1050" alt="Screenshot 2026-10-03 195237" src="https://github.com/user-attachments/assets/bb30fef5-0a34-476d-9df0-ad74a60b1048" />
+
 # STM32L4S5 HTTP Client – Local Server Communication
 
 ## Overview
