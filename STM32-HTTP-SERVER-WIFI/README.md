@@ -1,5 +1,5 @@
 <img width="1035" height="1050" alt="Screenshot 2026-10-03 195237" src="https://github.com/user-attachments/assets/7d6df161-96e1-4fc2-8989-debb869d460f" />
-STM32L4S5 HTTP Client – Local Server Communication
+```text STM32L4S5 HTTP Client – Local Server Communication
 Overview
 This project demonstrates how an STM32L4S5 communicates with a local HTTP server over Wi-Fi using the ISM43362 Wi-Fi module.
 The STM32 acts as an HTTP client. It connects to a local Wi-Fi network, establishes a TCP connection to a computer running a local HTTP server, sends an HTTP request, and receives the HTTP response.
